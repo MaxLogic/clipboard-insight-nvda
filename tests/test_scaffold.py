@@ -28,6 +28,11 @@ class ScaffoldTests(unittest.TestCase):
 		):
 			self.assertTrue((ROOT / relative).exists(), relative)
 
+	def test_docs_include_long_text_behavior(self):
+		for relative in ("README.md", "addon/doc/en/readme.md"):
+			text = (ROOT / relative).read_text(encoding="utf-8")
+			self.assertIn("Press `NVDA+C` twice to read the full text", text)
+
 	def test_build_creates_addon_package(self):
 		result = subprocess.run(
 			[sys.executable, "build.py"],

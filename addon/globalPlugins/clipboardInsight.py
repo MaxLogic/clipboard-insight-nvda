@@ -5,7 +5,7 @@ import scriptHandler
 import speech
 import ui
 
-from clipboardInsightLib.reporting import report_text
+from clipboardInsightLib.reporting import LONG_TEXT_THRESHOLD, report_text
 
 
 addonHandler.initTranslation()
@@ -24,7 +24,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		except Exception:
 			text = ""
 		repeat_count = scriptHandler.getLastScriptRepeatCount()
-		if text and not text.isspace() and repeat_count:
+		if text and not text.isspace() and repeat_count and len(text) < LONG_TEXT_THRESHOLD:
 			speech.speakSpelling(text, useCharacterDescriptions=repeat_count > 1)
 			return
 		ui.message(report_text(text, repeat_count))

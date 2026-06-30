@@ -4,6 +4,11 @@ Clipboard Insight is an NVDA add-on that improves clipboard reporting with text 
 
 This repository is under active development.
 
+## Use
+
+- Press `NVDA+C` once to report clipboard text with character, word, line, and token counts.
+- If the clipboard contains long text, the first press reports only the counts. Press `NVDA+C` twice to read the full text.
+
 ## Build
 
 Run:

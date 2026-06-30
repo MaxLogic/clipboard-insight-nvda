@@ -1,24 +1,11 @@
 # Clipboard Insight Tasks
 
-Summary: 4 open, 0 in progress, 0 blocked, 2 done
+Summary: 3 open, 0 in progress, 0 blocked, 3 done
 Next task ID: T-007
 
 ## In Progress
 
 ## Next - Today
-
-### T-003 [TEXT] Add long text repeat behavior
-Outcome:
-- First press on text over 1024 characters reports metrics without reading full text.
-- Second press on long text reads full text and metrics.
-- Short text repeat behavior preserves spell and character-description script branches.
-Proof:
-- Run: `python -m unittest tests.test_reporting`
-  Expect: all pass
-Touches: addon/globalPlugins/clipboardInsight.py, addon/globalPlugins/clipboardInsightLib/, tests/test_reporting.py
-Deps: T-002
-Verify: unit-test
-Notes: Plan slice 3.
 
 ### T-004 [FILES] Report file clipboard content
 Outcome:
@@ -69,6 +56,19 @@ Notes: Plan slice 6.
 ## Blocked
 
 ## Done
+
+### T-003 [TEXT] Add long text repeat behavior
+Outcome:
+- First press on text over 1024 characters reports metrics without reading full text.
+- Second press on long text reads full text and metrics.
+- Short text repeat behavior preserves spell and character-description script branches.
+Proof:
+- Run: `python -m unittest tests.test_reporting`
+  Expect: all pass
+Touches: addon/globalPlugins/clipboardInsight.py, addon/globalPlugins/clipboardInsightLib/, tests/test_reporting.py
+Deps: T-002
+Verify: unit-test
+Notes: Plan slice 3. Completed with README/add-on help documentation.
 
 ### T-002 [TEXT] Add clipboard text metrics
 Outcome:

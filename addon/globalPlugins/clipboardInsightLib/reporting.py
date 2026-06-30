@@ -3,6 +3,9 @@ from __future__ import annotations
 from .metrics import measure_text
 
 
+LONG_TEXT_THRESHOLD = 1024
+
+
 def _plural(count: int, singular: str, plural: str | None = None) -> str:
 	return f"{count} {singular if count == 1 else (plural or singular + 's')}"
 
@@ -23,6 +26,10 @@ def _metrics_text(text: str) -> str:
 def report_text(text: str, repeat_count: int) -> str:
 	if not text or text.isspace():
 		return "There is no text or file content on the clipboard"
+	if len(text) >= LONG_TEXT_THRESHOLD:
+		if repeat_count == 0:
+			return f"The clipboard contains a large amount of text. {_metrics_text(text)}. Press NVDA+c twice to read it."
+		return f"{text}. {_metrics_text(text)}"
 	if repeat_count == 1:
 		return f"SPELL:{text}"
 	if repeat_count > 1:
