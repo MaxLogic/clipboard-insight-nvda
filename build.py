@@ -22,12 +22,14 @@ def main() -> int:
 	version = _manifest_value("version")
 	DIST.mkdir(exist_ok=True)
 	package = DIST / f"{name}-{version}.nvda-addon"
-	if package.exists():
-		package.unlink()
-	with zipfile.ZipFile(package, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+	temp_package = package.with_suffix(package.suffix + ".tmp")
+	if temp_package.exists():
+		temp_package.unlink()
+	with zipfile.ZipFile(temp_package, "w", compression=zipfile.ZIP_DEFLATED) as archive:
 		for path in ADDON.rglob("*"):
 			if path.is_file() and "__pycache__" not in path.parts:
 				archive.write(path, path.relative_to(ADDON).as_posix())
+	temp_package.replace(package)
 	print(package)
 	return 0
 

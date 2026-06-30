@@ -1,25 +1,11 @@
 # Clipboard Insight Tasks
 
-Summary: 5 open, 0 in progress, 0 blocked, 1 done
+Summary: 4 open, 0 in progress, 0 blocked, 2 done
 Next task ID: T-007
 
 ## In Progress
 
 ## Next - Today
-
-### T-002 [TEXT] Add clipboard text metrics
-Outcome:
-- Text metrics include characters, words, lines, and `tiktoken` token count using `o200k_base`.
-- Fallback token counting is used only when `tiktoken` cannot load and labels tokens as estimated.
-- Short text report content includes text plus metrics.
-- Empty clipboard report says there is no text or file content.
-Proof:
-- Run: `python -m unittest tests.test_metrics tests.test_reporting`
-  Expect: all pass
-Touches: addon/globalPlugins/clipboardInsight.py, addon/globalPlugins/clipboardInsightLib/, tests/
-Deps: T-001
-Verify: unit-test
-Notes: Plan slice 2.
 
 ### T-003 [TEXT] Add long text repeat behavior
 Outcome:
@@ -83,6 +69,20 @@ Notes: Plan slice 6.
 ## Blocked
 
 ## Done
+
+### T-002 [TEXT] Add clipboard text metrics
+Outcome:
+- Text metrics include characters, words, lines, and `tiktoken` token count using `o200k_base`.
+- Fallback token counting is used only when `tiktoken` cannot load and labels tokens as estimated.
+- Short text report content includes text plus metrics.
+- Empty clipboard report says there is no text or file content.
+Proof:
+- Run: `python -m unittest tests.test_metrics tests.test_reporting`
+  Expect: all pass
+Touches: addon/globalPlugins/clipboardInsight.py, addon/globalPlugins/clipboardInsightLib/, tests/
+Deps: T-001
+Verify: unit-test
+Notes: Plan slice 2. Completed with bundled offline `o200k_base` data, special-token literal handling, and fallback-estimated proof.
 
 ### T-001 [SCAFFOLD] Scaffold add-on repository
 Outcome:

@@ -46,15 +46,33 @@ class ScaffoldTests(unittest.TestCase):
 			names = set(archive.namelist())
 		self.assertIn("manifest.ini", names)
 		self.assertIn("globalPlugins/clipboardInsight.py", names)
+		self.assertIn("globalPlugins/tiktoken/_tiktoken.cp313-win_amd64.pyd", names)
+		self.assertIn("globalPlugins/tiktoken/LICENSE", names)
+		self.assertIn("globalPlugins/tiktoken_ext/data/o200k_base.tiktoken", names)
+		self.assertIn("globalPlugins/tiktoken_ext/openai_public.py", names)
 		self.assertIn("doc/en/readme.md", names)
 
 	def test_global_plugin_imports_with_nvda_stubs(self):
 		addon_handler = types.SimpleNamespace(initTranslation=lambda: None)
+		api = types.SimpleNamespace(getClipData=lambda: "")
 		global_plugin_handler = types.ModuleType("globalPluginHandler")
 		global_plugin_handler.GlobalPlugin = type("GlobalPlugin", (), {})
-		original = {name: sys.modules.get(name) for name in ("addonHandler", "globalPluginHandler")}
+		script_handler = types.SimpleNamespace(
+			getLastScriptRepeatCount=lambda: 0,
+			script=lambda **kwargs: lambda func: func,
+		)
+		speech = types.SimpleNamespace(speakSpelling=lambda *args, **kwargs: None)
+		ui = types.SimpleNamespace(message=lambda text: None)
+		original = {
+			name: sys.modules.get(name)
+			for name in ("addonHandler", "api", "globalPluginHandler", "scriptHandler", "speech", "ui")
+		}
 		sys.modules["addonHandler"] = addon_handler
+		sys.modules["api"] = api
 		sys.modules["globalPluginHandler"] = global_plugin_handler
+		sys.modules["scriptHandler"] = script_handler
+		sys.modules["speech"] = speech
+		sys.modules["ui"] = ui
 		try:
 			path = ROOT / "addon" / "globalPlugins" / "clipboardInsight.py"
 			spec = importlib.util.spec_from_file_location("clipboardInsightTest", path)
