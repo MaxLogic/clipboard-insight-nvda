@@ -19,7 +19,7 @@ Next task ID: T-007
 Outcome:
 - README and add-on user doc name every default gesture.
 - Docs state token counts use `tiktoken` with `o200k_base` and fallback estimates only on tokenizer failure.
-- Docs state clipboard contents are not logged and history is not persisted in v1.
+- Docs state clipboard contents are not logged or persisted.
 - Package builds cleanly.
 Proof:
 - Run: `python -m unittest tests.test_scaffold`
@@ -31,7 +31,7 @@ Deps: T-005
 Verify: unit-test, cli-proof
 Notes: Plan slice 6. Completed with `docFileName = readme.md` matching packaged docs.
 
-### T-005 [HISTORY] Add clipboard history navigation
+### T-005 [HISTORY] Add clipboard history navigation (removed)
 Outcome:
 - History deduplicates consecutive identical clipboard entries.
 - Previous and next history commands are exposed with configurable default gestures.
@@ -42,7 +42,7 @@ Proof:
 Touches: addon/globalPlugins/clipboardInsight.py, addon/globalPlugins/clipboardInsightLib/, tests/
 Deps: T-004
 Verify: unit-test
-Notes: Plan slice 5. Completed with in-memory history and `NVDA+alt+upArrow` / `NVDA+alt+downArrow` defaults.
+Notes: Plan slice 5. Completed with in-memory history and `NVDA+alt+upArrow` / `NVDA+alt+downArrow` defaults. Superseded on 2026-06-30 by user request to remove clipboard history from the add-on.
 
 ### T-004 [FILES] Report file clipboard content
 Outcome:

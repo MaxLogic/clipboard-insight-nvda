@@ -34,13 +34,11 @@ class ScaffoldTests(unittest.TestCase):
 		for relative in ("README.md", "addon/doc/en/readme.md"):
 			text = (ROOT / relative).read_text(encoding="utf-8")
 			self.assertIn("Press `NVDA+C` twice to read the full text", text)
-			self.assertIn("NVDA+Alt+UpArrow", text)
-			self.assertIn("NVDA+Alt+DownArrow", text)
 			self.assertIn("tiktoken", text)
 			self.assertIn("o200k_base", text)
 			self.assertIn("estimated", text)
 			self.assertIn("not logged", text)
-			self.assertIn("not persisted", text)
+			self.assertIn("not logged or persisted", text)
 
 	def test_build_creates_addon_package(self):
 		result = subprocess.run(
@@ -109,8 +107,8 @@ class ScaffoldTests(unittest.TestCase):
 			spec.loader.exec_module(module)
 			self.assertTrue(hasattr(module, "GlobalPlugin"))
 			source = path.read_text(encoding="utf-8")
-			self.assertIn("kb:NVDA+alt+upArrow", source)
-			self.assertIn("kb:NVDA+alt+downArrow", source)
+			self.assertNotIn("kb:NVDA+alt+upArrow", source)
+			self.assertNotIn("kb:NVDA+alt+downArrow", source)
 		finally:
 			for name, value in original.items():
 				if value is None:
