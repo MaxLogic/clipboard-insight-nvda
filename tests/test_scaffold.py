@@ -1,0 +1,74 @@
+import importlib.util
+import subprocess
+import sys
+import types
+import unittest
+import zipfile
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+class ScaffoldTests(unittest.TestCase):
+	def test_manifest_metadata(self):
+		manifest_path = ROOT / "addon" / "manifest.ini"
+		self.assertTrue(manifest_path.exists())
+		manifest = manifest_path.read_text(encoding="utf-8")
+		self.assertIn("name = maxlogicClipboardInsight", manifest)
+		self.assertIn('summary = "Clipboard Insight"', manifest)
+
+	def test_expected_files_exist(self):
+		for relative in (
+			"README.md",
+			"CHANGELOG.md",
+			"build.py",
+			"addon/doc/en/readme.md",
+			"addon/globalPlugins/clipboardInsight.py",
+		):
+			self.assertTrue((ROOT / relative).exists(), relative)
+
+	def test_build_creates_addon_package(self):
+		result = subprocess.run(
+			[sys.executable, "build.py"],
+			cwd=ROOT,
+			text=True,
+			capture_output=True,
+		)
+		self.assertEqual(result.returncode, 0, result.stderr)
+		self.assertIn(".nvda-addon", result.stdout)
+		self.assertTrue(any((ROOT / "dist").glob("maxlogicClipboardInsight-*.nvda-addon")))
+
+	def test_package_contains_addon_files(self):
+		subprocess.run([sys.executable, "build.py"], cwd=ROOT, check=True, capture_output=True)
+		package = next((ROOT / "dist").glob("maxlogicClipboardInsight-*.nvda-addon"))
+		with zipfile.ZipFile(package) as archive:
+			names = set(archive.namelist())
+		self.assertIn("manifest.ini", names)
+		self.assertIn("globalPlugins/clipboardInsight.py", names)
+		self.assertIn("doc/en/readme.md", names)
+
+	def test_global_plugin_imports_with_nvda_stubs(self):
+		addon_handler = types.SimpleNamespace(initTranslation=lambda: None)
+		global_plugin_handler = types.ModuleType("globalPluginHandler")
+		global_plugin_handler.GlobalPlugin = type("GlobalPlugin", (), {})
+		original = {name: sys.modules.get(name) for name in ("addonHandler", "globalPluginHandler")}
+		sys.modules["addonHandler"] = addon_handler
+		sys.modules["globalPluginHandler"] = global_plugin_handler
+		try:
+			path = ROOT / "addon" / "globalPlugins" / "clipboardInsight.py"
+			spec = importlib.util.spec_from_file_location("clipboardInsightTest", path)
+			module = importlib.util.module_from_spec(spec)
+			module.__dict__["_"] = lambda text: text
+			spec.loader.exec_module(module)
+			self.assertTrue(hasattr(module, "GlobalPlugin"))
+		finally:
+			for name, value in original.items():
+				if value is None:
+					sys.modules.pop(name, None)
+				else:
+					sys.modules[name] = value
+
+
+if __name__ == "__main__":
+	unittest.main()
