@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "addon" / "globalPlugins"))
+sys.path.insert(0, str(ROOT / "addon" / "lib"))
 
 from clipboardInsightLib.files import summarize_files
 from clipboardInsightLib.windows_clipboard import CF_HDROP, _configure_clipboard_api

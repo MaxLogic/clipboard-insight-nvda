@@ -8,3 +8,6 @@
 - Long clipboard text now reports counts first and reads the full text on repeated `NVDA+C`.
 - File clipboard reporting for copied files, including first paths and remaining count.
 - In-memory clipboard history navigation with `NVDA+Alt+UpArrow` and `NVDA+Alt+DownArrow`.
+
+### Fixed
+- Load bundled helper libraries from the add-on private `lib` directory so NVDA can import the global plugin on startup.

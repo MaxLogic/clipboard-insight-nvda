@@ -26,6 +26,7 @@ class ScaffoldTests(unittest.TestCase):
 			"build.py",
 			"addon/doc/en/readme.md",
 			"addon/globalPlugins/clipboardInsight.py",
+			"addon/lib/clipboardInsightLib/__init__.py",
 		):
 			self.assertTrue((ROOT / relative).exists(), relative)
 
@@ -59,11 +60,17 @@ class ScaffoldTests(unittest.TestCase):
 			names = set(archive.namelist())
 		self.assertIn("manifest.ini", names)
 		self.assertIn("globalPlugins/clipboardInsight.py", names)
-		self.assertIn("globalPlugins/tiktoken/_tiktoken.cp313-win_amd64.pyd", names)
-		self.assertIn("globalPlugins/tiktoken/LICENSE", names)
-		self.assertIn("globalPlugins/tiktoken_ext/data/o200k_base.tiktoken", names)
-		self.assertIn("globalPlugins/tiktoken_ext/openai_public.py", names)
+		self.assertIn("lib/tiktoken/_tiktoken.cp313-win_amd64.pyd", names)
+		self.assertIn("lib/tiktoken/LICENSE", names)
+		self.assertIn("lib/tiktoken_ext/data/o200k_base.tiktoken", names)
+		self.assertIn("lib/tiktoken_ext/openai_public.py", names)
+		self.assertTrue(any(name.startswith("lib/regex/") for name in names))
 		self.assertIn("doc/en/readme.md", names)
+
+	def test_global_plugins_does_not_contain_dependency_packages(self):
+		global_plugins = ROOT / "addon" / "globalPlugins"
+		dependency_packages = {"clipboardInsightLib", "tiktoken", "tiktoken_ext"}
+		self.assertFalse(dependency_packages.intersection(path.name for path in global_plugins.iterdir()))
 
 	def test_global_plugin_imports_with_nvda_stubs(self):
 		addon_handler = types.SimpleNamespace(initTranslation=lambda: None)
@@ -95,8 +102,8 @@ class ScaffoldTests(unittest.TestCase):
 		sys.modules["ui"] = ui
 		try:
 			path = ROOT / "addon" / "globalPlugins" / "clipboardInsight.py"
-			sys.path.insert(0, str(path.parent))
-			spec = importlib.util.spec_from_file_location("clipboardInsightTest", path)
+			sys.path.insert(0, str(ROOT / "addon"))
+			spec = importlib.util.spec_from_file_location("globalPlugins.clipboardInsight", path)
 			module = importlib.util.module_from_spec(spec)
 			module.__dict__["_"] = lambda text: text
 			spec.loader.exec_module(module)
@@ -111,7 +118,7 @@ class ScaffoldTests(unittest.TestCase):
 				else:
 					sys.modules[name] = value
 			try:
-				sys.path.remove(str(path.parent))
+				sys.path.remove(str(ROOT / "addon"))
 			except ValueError:
 				pass
 

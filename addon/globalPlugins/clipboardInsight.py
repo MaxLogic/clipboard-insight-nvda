@@ -1,9 +1,17 @@
+from pathlib import Path
+import sys
+
 import addonHandler
 import api
 import globalPluginHandler
 import scriptHandler
 import speech
 import ui
+
+
+_LIB = Path(__file__).resolve().parents[1] / "lib"
+if str(_LIB) not in sys.path:
+	sys.path.insert(0, str(_LIB))
 
 from clipboardInsightLib.reporting import LONG_TEXT_THRESHOLD, report_text
 from clipboardInsightLib.files import summarize_files

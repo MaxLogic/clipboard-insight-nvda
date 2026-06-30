@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "addon" / "globalPlugins"))
+sys.path.insert(0, str(ROOT / "addon" / "lib"))
 
 import tiktoken
 
@@ -17,7 +17,7 @@ class MetricsTests(unittest.TestCase):
 		text = "Hello world\nagain"
 		metrics = measure_text(text)
 		expected_tokens = len(tiktoken.get_encoding("o200k_base").encode(text))
-		self.assertTrue(Path(tiktoken.__file__).is_relative_to(ROOT / "addon" / "globalPlugins"))
+		self.assertTrue(Path(tiktoken.__file__).is_relative_to(ROOT / "addon" / "lib"))
 		self.assertEqual(metrics.characters, len(text))
 		self.assertEqual(metrics.words, 3)
 		self.assertEqual(metrics.lines, 2)
