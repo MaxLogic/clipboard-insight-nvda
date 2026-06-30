@@ -1,24 +1,11 @@
 # Clipboard Insight Tasks
 
-Summary: 2 open, 0 in progress, 0 blocked, 4 done
+Summary: 1 open, 0 in progress, 0 blocked, 5 done
 Next task ID: T-007
 
 ## In Progress
 
 ## Next - Today
-
-### T-005 [HISTORY] Add clipboard history navigation
-Outcome:
-- History deduplicates consecutive identical clipboard entries.
-- Previous and next history commands are exposed with configurable default gestures.
-- History stays in memory only.
-Proof:
-- Run: `python -m unittest tests.test_history tests.test_reporting`
-  Expect: all pass
-Touches: addon/globalPlugins/clipboardInsight.py, addon/globalPlugins/clipboardInsightLib/, tests/
-Deps: T-004
-Verify: unit-test
-Notes: Plan slice 5.
 
 ### T-006 [DOC] Finish docs and release metadata
 Outcome:
@@ -43,6 +30,19 @@ Notes: Plan slice 6.
 ## Blocked
 
 ## Done
+
+### T-005 [HISTORY] Add clipboard history navigation
+Outcome:
+- History deduplicates consecutive identical clipboard entries.
+- Previous and next history commands are exposed with configurable default gestures.
+- History stays in memory only.
+Proof:
+- Run: `python -m unittest tests.test_history tests.test_reporting`
+  Expect: all pass
+Touches: addon/globalPlugins/clipboardInsight.py, addon/globalPlugins/clipboardInsightLib/, tests/
+Deps: T-004
+Verify: unit-test
+Notes: Plan slice 5. Completed with in-memory history and `NVDA+alt+upArrow` / `NVDA+alt+downArrow` defaults.
 
 ### T-004 [FILES] Report file clipboard content
 Outcome:
