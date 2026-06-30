@@ -17,6 +17,7 @@ class ScaffoldTests(unittest.TestCase):
 		manifest = manifest_path.read_text(encoding="utf-8")
 		self.assertIn("name = maxlogicClipboardInsight", manifest)
 		self.assertIn('summary = "Clipboard Insight"', manifest)
+		self.assertIn("docFileName = readme.md", manifest)
 
 	def test_expected_files_exist(self):
 		for relative in (
@@ -34,6 +35,11 @@ class ScaffoldTests(unittest.TestCase):
 			self.assertIn("Press `NVDA+C` twice to read the full text", text)
 			self.assertIn("NVDA+Alt+UpArrow", text)
 			self.assertIn("NVDA+Alt+DownArrow", text)
+			self.assertIn("tiktoken", text)
+			self.assertIn("o200k_base", text)
+			self.assertIn("estimated", text)
+			self.assertIn("not logged", text)
+			self.assertIn("not persisted", text)
 
 	def test_build_creates_addon_package(self):
 		result = subprocess.run(
@@ -89,6 +95,7 @@ class ScaffoldTests(unittest.TestCase):
 		sys.modules["ui"] = ui
 		try:
 			path = ROOT / "addon" / "globalPlugins" / "clipboardInsight.py"
+			sys.path.insert(0, str(path.parent))
 			spec = importlib.util.spec_from_file_location("clipboardInsightTest", path)
 			module = importlib.util.module_from_spec(spec)
 			module.__dict__["_"] = lambda text: text
@@ -103,6 +110,10 @@ class ScaffoldTests(unittest.TestCase):
 					sys.modules.pop(name, None)
 				else:
 					sys.modules[name] = value
+			try:
+				sys.path.remove(str(path.parent))
+			except ValueError:
+				pass
 
 
 if __name__ == "__main__":

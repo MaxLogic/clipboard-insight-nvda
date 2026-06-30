@@ -10,6 +10,10 @@ This repository is under active development.
 - If the clipboard contains long text, the first press reports only the counts. Press `NVDA+C` twice to read the full text.
 - Press `NVDA+Alt+UpArrow` or `NVDA+Alt+DownArrow` to move through Clipboard Insight history captured during clipboard reports.
 
+Token counts use bundled `tiktoken` with the `o200k_base` encoding. If the tokenizer cannot load, Clipboard Insight falls back to estimated token counts and says they are estimated.
+
+Clipboard contents are not logged. Clipboard Insight history is kept in memory only and is not persisted.
+
 ## Build
 
 Run:

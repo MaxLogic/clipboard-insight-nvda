@@ -1,11 +1,19 @@
 # Clipboard Insight Tasks
 
-Summary: 1 open, 0 in progress, 0 blocked, 5 done
+Summary: 0 open, 0 in progress, 0 blocked, 6 done
 Next task ID: T-007
 
 ## In Progress
 
 ## Next - Today
+
+## Next - This Week
+
+## Next - Later
+
+## Blocked
+
+## Done
 
 ### T-006 [DOC] Finish docs and release metadata
 Outcome:
@@ -21,15 +29,7 @@ Proof:
 Touches: README.md, addon/doc/en/readme.md, CHANGELOG.md, addon/manifest.ini
 Deps: T-005
 Verify: unit-test, cli-proof
-Notes: Plan slice 6.
-
-## Next - This Week
-
-## Next - Later
-
-## Blocked
-
-## Done
+Notes: Plan slice 6. Completed with `docFileName = readme.md` matching packaged docs.
 
 ### T-005 [HISTORY] Add clipboard history navigation
 Outcome:
