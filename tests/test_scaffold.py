@@ -60,6 +60,11 @@ class ScaffoldTests(unittest.TestCase):
 	def test_global_plugin_imports_with_nvda_stubs(self):
 		addon_handler = types.SimpleNamespace(initTranslation=lambda: None)
 		api = types.SimpleNamespace(getClipData=lambda: "")
+		ctypes_stub = types.ModuleType("ctypes")
+		ctypes_stub.windll = types.SimpleNamespace()
+		ctypes_stub.create_unicode_buffer = lambda size: [""] * size
+		wintypes_stub = types.ModuleType("wintypes")
+		ctypes_stub.wintypes = wintypes_stub
 		global_plugin_handler = types.ModuleType("globalPluginHandler")
 		global_plugin_handler.GlobalPlugin = type("GlobalPlugin", (), {})
 		script_handler = types.SimpleNamespace(
@@ -70,10 +75,12 @@ class ScaffoldTests(unittest.TestCase):
 		ui = types.SimpleNamespace(message=lambda text: None)
 		original = {
 			name: sys.modules.get(name)
-			for name in ("addonHandler", "api", "globalPluginHandler", "scriptHandler", "speech", "ui")
+			for name in ("addonHandler", "api", "ctypes", "ctypes.wintypes", "globalPluginHandler", "scriptHandler", "speech", "ui")
 		}
 		sys.modules["addonHandler"] = addon_handler
 		sys.modules["api"] = api
+		sys.modules["ctypes"] = ctypes_stub
+		sys.modules["ctypes.wintypes"] = wintypes_stub
 		sys.modules["globalPluginHandler"] = global_plugin_handler
 		sys.modules["scriptHandler"] = script_handler
 		sys.modules["speech"] = speech

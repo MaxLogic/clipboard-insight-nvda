@@ -1,24 +1,11 @@
 # Clipboard Insight Tasks
 
-Summary: 3 open, 0 in progress, 0 blocked, 3 done
+Summary: 2 open, 0 in progress, 0 blocked, 4 done
 Next task ID: T-007
 
 ## In Progress
 
 ## Next - Today
-
-### T-004 [FILES] Report file clipboard content
-Outcome:
-- File clipboard summaries report one copied file with path and kind.
-- Multiple copied files report the first three paths and remaining count.
-- File summary code is isolated from Windows clipboard API calls so it can be unit-tested.
-Proof:
-- Run: `python -m unittest tests.test_files`
-  Expect: all pass
-Touches: addon/globalPlugins/clipboardInsightLib/, tests/test_files.py
-Deps: T-002
-Verify: unit-test
-Notes: Plan slice 4.
 
 ### T-005 [HISTORY] Add clipboard history navigation
 Outcome:
@@ -56,6 +43,19 @@ Notes: Plan slice 6.
 ## Blocked
 
 ## Done
+
+### T-004 [FILES] Report file clipboard content
+Outcome:
+- File clipboard summaries report one copied file with path and kind.
+- Multiple copied files report the first three paths and remaining count.
+- File summary code is isolated from Windows clipboard API calls so it can be unit-tested.
+Proof:
+- Run: `python -m unittest tests.test_files`
+  Expect: all pass
+Touches: addon/globalPlugins/clipboardInsightLib/, tests/test_files.py
+Deps: T-002
+Verify: unit-test
+Notes: Plan slice 4. Completed with pointer-safe `CF_HDROP` wrapper signatures.
 
 ### T-003 [TEXT] Add long text repeat behavior
 Outcome:
