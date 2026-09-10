@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- Update compatibility metadata for NVDA 2026.2 and the bundled Python 3.13 libraries.
+
 ## Unreleased
 
 ### Added
