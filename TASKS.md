@@ -1,6 +1,6 @@
 # Clipboard Insight Tasks
+Task schema: 1
 
-Summary: 0 open, 0 in progress, 0 blocked, 6 done
 Next task ID: T-007
 
 ## In Progress
