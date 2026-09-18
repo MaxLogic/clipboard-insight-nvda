@@ -86,9 +86,10 @@ class ScaffoldTests(unittest.TestCase):
 		)
 		speech = types.SimpleNamespace(speakSpelling=lambda *args, **kwargs: None)
 		ui = types.SimpleNamespace(message=lambda text: None)
+		queue_handler = types.SimpleNamespace(eventQueue=None, queueFunction=lambda queue, func, *args: func(*args))
 		original = {
 			name: sys.modules.get(name)
-			for name in ("addonHandler", "api", "ctypes", "ctypes.wintypes", "globalPluginHandler", "scriptHandler", "speech", "ui")
+			for name in ("addonHandler", "api", "ctypes", "ctypes.wintypes", "globalPluginHandler", "scriptHandler", "speech", "ui", "queueHandler")
 		}
 		sys.modules["addonHandler"] = addon_handler
 		sys.modules["api"] = api
@@ -98,6 +99,7 @@ class ScaffoldTests(unittest.TestCase):
 		sys.modules["scriptHandler"] = script_handler
 		sys.modules["speech"] = speech
 		sys.modules["ui"] = ui
+		sys.modules["queueHandler"] = queue_handler
 		try:
 			path = ROOT / "addon" / "globalPlugins" / "clipboardInsight.py"
 			sys.path.insert(0, str(ROOT / "addon"))

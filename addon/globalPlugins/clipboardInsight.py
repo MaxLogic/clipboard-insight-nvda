@@ -1,9 +1,11 @@
 from pathlib import Path
 import sys
+import threading
 
 import addonHandler
 import api
 import globalPluginHandler
+import queueHandler
 import scriptHandler
 import speech
 import ui
@@ -23,12 +25,15 @@ addonHandler.initTranslation()
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	scriptCategory = _("Clipboard Insight")
+	# Counts presses, so a slow report for an earlier press is never spoken after a newer one.
+	_latestRequest = 0
 
 	@scriptHandler.script(
 		description=_("Reports clipboard text with characters, words, and token count."),
 		gesture="kb:NVDA+c",
 	)
 	def script_reportClipboardText(self, gesture):
+		self._latestRequest += 1
 		try:
 			text = api.getClipData()
 		except Exception:
@@ -46,5 +51,19 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		if text and not text.isspace() and repeat_count and len(text) < LONG_TEXT_THRESHOLD:
 			speech.speakSpelling(text, useCharacterDescriptions=repeat_count > 1)
 			return
-		message = report_text(text, repeat_count)
-		ui.message(message)
+		self._reportInBackground(text, repeat_count)
+
+	def _reportInBackground(self, text, repeatCount):
+		# Loading the tokenizer takes over a second, and a large clipboard takes seconds to count.
+		# Doing that on NVDA's main thread would freeze NVDA.
+		request = self._latestRequest
+
+		def work():
+			message = report_text(text, repeatCount)
+			queueHandler.queueFunction(queueHandler.eventQueue, self._speakIfLatest, request, message)
+
+		threading.Thread(target=work, name="ClipboardInsightReport", daemon=True).start()
+
+	def _speakIfLatest(self, request, message):
+		if request == self._latestRequest:
+			ui.message(message)
