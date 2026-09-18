@@ -1,7 +1,7 @@
 # Clipboard Insight Tasks
 Task schema: 1
 
-Next task ID: T-007
+Next task ID: T-010
 
 ## In Progress
 
@@ -10,6 +10,31 @@ Next task ID: T-007
 ## Next - This Week
 
 ## Next - Later
+
+### T-007 [CLI] Make the spoken reports translatable
+Outcome:
+- the messages built in `clipboardInsightLib.reporting` and `clipboardInsightLib.files` are wrapped in `_()` or built by the plugin from translated templates
+Proof:
+- Run: `python -m unittest discover -s tests`
+  Expect: OK
+Touches: addon/lib/clipboardInsightLib/reporting.py, addon/lib/clipboardInsightLib/files.py, addon/globalPlugins/clipboardInsight.py
+Verify: cli-proof
+Notes: Every other user-facing string in the add-on is already translatable.
+
+### T-008 [CLI] Retry when another program holds the clipboard
+Outcome:
+- when `OpenClipboard` fails because another program has the clipboard open, reading copied files is retried briefly instead of reporting that the clipboard is empty
+Proof:
+- Run: `python -m unittest discover -s tests`
+  Expect: OK
+Touches: addon/lib/clipboardInsightLib/windows_clipboard.py
+Verify: cli-proof, manual
+
+### T-009 [CLI] Remove the unreachable spelling results from report_text
+Outcome:
+- `report_text` no longer returns `SPELL:` or `CHAR_DESC:` strings; the plugin spells short text itself before calling it
+Touches: addon/lib/clipboardInsightLib/reporting.py, tests/test_reporting.py
+Verify: cli-proof
 
 ## Blocked
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased (review, September 2026)
+
+- NVDA no longer freezes while tokens are counted. The first NVDA+C used to freeze NVDA for about 1.3 s while the tokenizer loaded, and a 5 MB clipboard for about 2 s.
+- Reading copied files no longer changes Windows API definitions that NVDA and other add-ons share.
+
 ## 0.1.1
 
 - Update compatibility metadata for NVDA 2026.2 and the bundled Python 3.13 libraries.
