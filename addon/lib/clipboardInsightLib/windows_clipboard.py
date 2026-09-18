@@ -20,10 +20,22 @@ def _configure_clipboard_api(user32, shell32) -> None:
 	shell32.DragQueryFileW.restype = wintypes.UINT
 
 
+_api = None
+
+
+def _clipboard_api():
+	# Own DLL handles: ctypes.windll is shared with NVDA and every add-on, and these prototypes would change theirs.
+	global _api
+	if _api is None:
+		user32 = ctypes.WinDLL("user32")
+		shell32 = ctypes.WinDLL("shell32")
+		_configure_clipboard_api(user32, shell32)
+		_api = user32, shell32
+	return _api
+
+
 def get_clipboard_files() -> list[str]:
-	user32 = ctypes.windll.user32
-	shell32 = ctypes.windll.shell32
-	_configure_clipboard_api(user32, shell32)
+	user32, shell32 = _clipboard_api()
 	if not user32.OpenClipboard(None):
 		return []
 	try:

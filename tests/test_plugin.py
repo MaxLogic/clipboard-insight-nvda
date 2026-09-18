@@ -1,6 +1,8 @@
 """NVDA+C must not freeze NVDA, and the add-on must not change shared Windows API prototypes."""
 import builtins
+import ctypes
 import importlib.util
+import os
 from pathlib import Path
 import sys
 import threading
@@ -80,6 +82,17 @@ class PluginTests(unittest.TestCase):
 			release.set()
 			time.sleep(0.2)
 		self.assertEqual(self.spoken, ["second text"])
+
+
+@unittest.skipUnless(os.name == "nt", "Windows clipboard")
+class SharedPrototypeTests(unittest.TestCase):
+	def test_reading_clipboard_files_leaves_shared_prototypes_alone(self):
+		from clipboardInsightLib.windows_clipboard import get_clipboard_files
+		functions = (ctypes.windll.user32.GetClipboardData, ctypes.windll.user32.OpenClipboard, ctypes.windll.shell32.DragQueryFileW)
+		before = [(function.argtypes, function.restype) for function in functions]
+		get_clipboard_files()
+		after = [(function.argtypes, function.restype) for function in functions]
+		self.assertEqual(after, before, "the add-on changed ctypes.windll functions that NVDA and other add-ons share")
 
 
 if __name__ == "__main__":
