@@ -17,7 +17,7 @@ class ScaffoldTests(unittest.TestCase):
 		manifest = manifest_path.read_text(encoding="utf-8")
 		self.assertIn("name = maxlogicClipboardInsight", manifest)
 		self.assertIn('summary = "Clipboard Insight"', manifest)
-		self.assertIn("docFileName = readme.md", manifest)
+		self.assertIn("docFileName = readme.html", manifest)
 
 	def test_expected_files_exist(self):
 		for relative in (
@@ -52,8 +52,8 @@ class ScaffoldTests(unittest.TestCase):
 		self.assertTrue(any((ROOT / "dist").glob("maxlogicClipboardInsight-*.nvda-addon")))
 
 	def test_package_contains_addon_files(self):
-		subprocess.run([sys.executable, "build.py"], cwd=ROOT, check=True, capture_output=True)
-		package = next((ROOT / "dist").glob("maxlogicClipboardInsight-*.nvda-addon"))
+		result = subprocess.run([sys.executable, "build.py"], cwd=ROOT, check=True, capture_output=True, text=True)
+		package = Path(result.stdout.strip().splitlines()[-1])
 		with zipfile.ZipFile(package) as archive:
 			names = set(archive.namelist())
 		self.assertIn("manifest.ini", names)
@@ -63,7 +63,8 @@ class ScaffoldTests(unittest.TestCase):
 		self.assertIn("lib/tiktoken_ext/data/o200k_base.tiktoken", names)
 		self.assertIn("lib/tiktoken_ext/openai_public.py", names)
 		self.assertTrue(any(name.startswith("lib/regex/") for name in names))
-		self.assertIn("doc/en/readme.md", names)
+		self.assertIn("doc/en/readme.html", names)
+		self.assertNotIn("doc/en/readme.md", names)
 
 	def test_global_plugins_does_not_contain_dependency_packages(self):
 		global_plugins = ROOT / "addon" / "globalPlugins"

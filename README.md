@@ -26,3 +26,7 @@ python build.py
 ```
 
 The package is written to `dist`.
+
+## License
+
+Clipboard Insight is released under the MIT License. See `LICENSE`. Bundled libraries are listed in `THIRD-PARTY-NOTICES.md`.

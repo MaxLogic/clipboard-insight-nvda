@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (review, September 2026)
+## 0.2.0
 
 - Pressing NVDA+C twice on a long clipboard reads the text in blocks of about 2000 characters, as NVDA's say all does. NVDA stays responsive, and Control stops the reading at once. Before, NVDA prepared the whole text at once and could not be interrupted until it was done.
 - NVDA no longer freezes while tokens are counted. The first NVDA+C used to freeze NVDA for about 1.3 s while the tokenizer loaded, and a 5 MB clipboard for about 2 s.
@@ -10,7 +10,7 @@
 
 - Update compatibility metadata for NVDA 2026.2 and the bundled Python 3.13 libraries.
 
-## Unreleased
+## 0.1.0
 
 ### Added
 - Initial Clipboard Insight add-on scaffold.
