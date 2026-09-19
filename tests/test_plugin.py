@@ -17,8 +17,25 @@ PLUGIN_PATH = ROOT / "addon/globalPlugins/clipboardInsight.py"
 sys.path.insert(0, str(ROOT / "addon/lib"))
 
 
+class _Callback(object):
+	def __init__(self, callback, name=None):
+		self.callback = callback
+
+
 class PluginTests(unittest.TestCase):
+	def speak(self, sequence):
+		# NVDA's speech: the text, then a callback it runs when speech reaches it.
+		self.sequences.append(sequence)
+		self.spoke.set()
+
+	def reached(self):
+		"""Speech got to the end of the last block, so NVDA runs its callback."""
+		callbacks = [item for item in self.sequences[-1] if isinstance(item, _Callback)]
+		self.assertEqual(len(callbacks), 1, "the block asks for no next block")
+		callbacks[0].callback()
+
 	def setUp(self):
+		self.sequences = []
 		self.spoken = []
 		self.spoke = threading.Event()
 		self.clipboard = ""
@@ -38,7 +55,8 @@ class PluginTests(unittest.TestCase):
 				script=lambda **kwargs: (lambda fn: fn),
 				getLastScriptRepeatCount=lambda: 0,
 			),
-			"speech": types.SimpleNamespace(speakSpelling=lambda *args, **kwargs: None),
+			"speech": types.SimpleNamespace(speakSpelling=lambda *args, **kwargs: None, speak=self.speak),
+			"speech.commands": types.SimpleNamespace(CallbackCommand=_Callback),
 			"ui": types.SimpleNamespace(message=message),
 			# Stands in for NVDA's main thread, which runs queued functions in order.
 			"queueHandler": types.SimpleNamespace(eventQueue="events", queueFunction=lambda queue, fn, *args: fn(*args)),
@@ -82,6 +100,33 @@ class PluginTests(unittest.TestCase):
 			release.set()
 			time.sleep(0.2)
 		self.assertEqual(self.spoken, ["second text"])
+
+	def test_a_long_text_is_read_in_blocks_one_after_another(self):
+		message = "".join("Line %d of a long clipboard text.\n" % n for n in range(2000))
+		self.plugin._speakIfLatest(self.plugin._latestRequest, message)
+		self.assertEqual(self.spoken, [], "the long text went to NVDA as one message")
+		while any(isinstance(item, _Callback) for item in self.sequences[-1]):
+			self.reached()
+		texts = [item for sequence in self.sequences for item in sequence if isinstance(item, str)]
+		self.assertEqual("".join(texts), message)
+		self.assertGreater(len(texts), 10)
+		self.assertTrue(all(len(text) <= self.module.READ_BLOCK_CHARS for text in texts))
+
+	def test_cancelled_reading_stops_and_a_newer_press_does_not_resume_it(self):
+		message = "word " * 5000
+		self.plugin._speakIfLatest(self.plugin._latestRequest, message)
+		self.reached()
+		self.assertEqual(len(self.sequences), 2)
+		# NVDA drops the callbacks of cancelled speech, so nothing more is read after Control.
+		# A late callback from an older reading must not continue it either.
+		self.plugin._latestRequest += 1
+		self.reached()
+		self.assertEqual(len(self.sequences), 2, "an old reading continued after a newer press")
+
+	def test_a_short_report_is_one_message(self):
+		self.plugin._speakIfLatest(self.plugin._latestRequest, "Hello. 1 word")
+		self.assertEqual(self.spoken, ["Hello. 1 word"])
+		self.assertEqual(self.sequences, [])
 
 
 @unittest.skipUnless(os.name == "nt", "Windows clipboard")

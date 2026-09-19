@@ -15,12 +15,16 @@ _LIB = Path(__file__).resolve().parents[1] / "lib"
 if str(_LIB) not in sys.path:
 	sys.path.insert(0, str(_LIB))
 
-from clipboardInsightLib.reporting import LONG_TEXT_THRESHOLD, report_text
+from clipboardInsightLib.reporting import LONG_TEXT_THRESHOLD, report_text, split_for_reading
 from clipboardInsightLib.files import summarize_files
 from clipboardInsightLib.windows_clipboard import get_clipboard_files
 
 
 addonHandler.initTranslation()
+
+# Longer reports are read one block at a time, like NVDA's say-all: NVDA prepares
+# each block quickly, and Control stops the reading at once.
+READ_BLOCK_CHARS = 2000
 
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
@@ -65,5 +69,21 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		threading.Thread(target=work, name="ClipboardInsightReport", daemon=True).start()
 
 	def _speakIfLatest(self, request, message):
-		if request == self._latestRequest:
+		if request != self._latestRequest:
+			return
+		if len(message) <= READ_BLOCK_CHARS:
 			ui.message(message)
+			return
+		self._readBlocks(request, split_for_reading(message, READ_BLOCK_CHARS), 0)
+
+	def _readBlocks(self, request, blocks, index):
+		# NVDA drops the callbacks of cancelled speech, so Control ends the chain. A newer press ends it too.
+		if request != self._latestRequest:
+			return
+		from speech.commands import CallbackCommand
+		sequence = [blocks[index]]
+		if index + 1 < len(blocks):
+			# Runs when speech starts this block, so the next one is always queued behind it.
+			sequence.insert(0, CallbackCommand(
+				lambda: self._readBlocks(request, blocks, index + 1), name="clipboardInsight.nextBlock"))
+		speech.speak(sequence)

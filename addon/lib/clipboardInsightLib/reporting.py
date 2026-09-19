@@ -35,3 +35,28 @@ def report_text(text: str, repeat_count: int) -> str:
 	if repeat_count > 1:
 		return f"CHAR_DESC:{text}"
 	return f"{text}. {_metrics_text(text)}"
+
+
+def split_for_reading(text: str, max_chars: int) -> list[str]:
+	"""Split text into blocks of at most max_chars that join back into the text.
+
+	Blocks end at a line break if one is in the second half of the block, else at a
+	sentence end, else at a space. Text without any of those is cut at max_chars.
+	"""
+	blocks = []
+	start = 0
+	while len(text) - start > max_chars:
+		window = text[start:start + max_chars]
+		half = max_chars // 2
+		cut = window.rfind("\n") + 1
+		if cut <= half:
+			cut = max(window.rfind(end) for end in (". ", "! ", "? ")) + 2
+		if cut <= half:
+			cut = window.rfind(" ") + 1
+		if cut <= 0:
+			cut = max_chars
+		blocks.append(text[start:start + cut])
+		start += cut
+	if start < len(text):
+		blocks.append(text[start:])
+	return blocks

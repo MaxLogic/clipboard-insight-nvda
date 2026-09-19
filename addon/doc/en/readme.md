@@ -7,7 +7,7 @@ This add-on is under active development.
 ## Use
 
 - Press `NVDA+C` once to report clipboard text with character, word, line, and token counts.
-- If the clipboard contains long text, the first press reports only the counts. Press `NVDA+C` twice to read the full text.
+- If the clipboard contains long text, the first press reports only the counts. Press `NVDA+C` twice to read the full text. The text is read in blocks, like NVDA's say all, so `Control` stops it at once, as with any other speech.
 - If the clipboard contains short text, press `NVDA+C` twice to spell it, or three times to spell it with character descriptions.
 - If you copied files, `NVDA+C` reports how many files are on the clipboard and names up to three of them.
 
