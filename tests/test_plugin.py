@@ -128,6 +128,25 @@ class PluginTests(unittest.TestCase):
 		self.assertEqual(self.spoken, ["Hello. 1 word"])
 		self.assertEqual(self.sequences, [])
 
+	def test_report_failure_is_announced_and_the_next_request_can_succeed(self):
+		with patch.object(self.module, "report_text", side_effect=RuntimeError("analysis failed")):
+			self.plugin._reportInBackground("text", 0)
+			self.assertTrue(self.spoke.wait(3), "analysis failed without feedback")
+		self.assertEqual(self.spoken, ["Could not analyze the clipboard. Press NVDA+c to try again."])
+		self.spoke.clear()
+		with patch.object(self.module, "report_text", return_value="recovered"):
+			self.plugin._reportInBackground("text", 0)
+			self.assertTrue(self.spoke.wait(3))
+		self.assertEqual(self.spoken[-1], "recovered")
+
+	def test_unloading_the_plugin_suppresses_queued_reports_and_reading(self):
+		request = self.plugin._latestRequest
+		self.plugin.terminate()
+		self.plugin._speakIfLatest(request, "old report")
+		self.plugin._readBlocks(request, ["old block"], 0)
+		self.assertEqual(self.spoken, [])
+		self.assertEqual(self.sequences, [])
+
 
 @unittest.skipUnless(os.name == "nt", "Windows clipboard")
 class SharedPrototypeTests(unittest.TestCase):

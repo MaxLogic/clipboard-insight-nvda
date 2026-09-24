@@ -31,6 +31,14 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	scriptCategory = _("Clipboard Insight")
 	# Counts presses, so a slow report for an earlier press is never spoken after a newer one.
 	_latestRequest = 0
+	_terminated = False
+
+	def terminate(self):
+		self._terminated = True
+		self._latestRequest += 1
+		terminate = getattr(super(), "terminate", None)
+		if terminate is not None:
+			terminate()
 
 	@scriptHandler.script(
 		description=_("Reports clipboard text with characters, words, and token count."),
@@ -63,13 +71,16 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		request = self._latestRequest
 
 		def work():
-			message = report_text(text, repeatCount)
+			try:
+				message = report_text(text, repeatCount)
+			except Exception:
+				message = _("Could not analyze the clipboard. Press NVDA+c to try again.")
 			queueHandler.queueFunction(queueHandler.eventQueue, self._speakIfLatest, request, message)
 
 		threading.Thread(target=work, name="ClipboardInsightReport", daemon=True).start()
 
 	def _speakIfLatest(self, request, message):
-		if request != self._latestRequest:
+		if self._terminated or request != self._latestRequest:
 			return
 		if len(message) <= READ_BLOCK_CHARS:
 			ui.message(message)
@@ -78,7 +89,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	def _readBlocks(self, request, blocks, index):
 		# NVDA drops the callbacks of cancelled speech, so Control ends the chain. A newer press ends it too.
-		if request != self._latestRequest:
+		if self._terminated or request != self._latestRequest:
 			return
 		from speech.commands import CallbackCommand
 		sequence = [blocks[index]]
